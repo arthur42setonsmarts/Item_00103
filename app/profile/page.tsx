@@ -5,7 +5,7 @@ import { getUserProfile, getRecentlyRatedBooks } from "@/lib/actions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BookOpen, Settings } from "lucide-react"
+import { BookOpen } from "lucide-react"
 import BookCard from "@/components/book-card"
 import ReadingStats from "@/components/reading-stats"
 import ShareButton from "@/components/share-button"
@@ -38,11 +38,7 @@ export default async function ProfilePage() {
               <CardDescription>Joined {user.joinedDate}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-center gap-4">
-                <Button variant="outline" size="sm">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Button>
+              <div className="flex justify-center">
                 <ShareButton url={`/profile`} title="My Profile" variant="outline" size="sm" />
               </div>
 

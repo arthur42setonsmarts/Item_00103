@@ -2,13 +2,13 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import RatingStars from "@/components/rating-stars"
 import { useToast } from "@/hooks/use-toast"
-import { rateBook } from "@/lib/actions"
 import { useRouter } from "next/navigation"
+import { saveClientRating, getClientRatingForBook } from "@/lib/client-storage"
 
 interface BookRatingFormProps {
   bookId: string
@@ -20,6 +20,17 @@ export default function BookRatingForm({ bookId }: BookRatingFormProps) {
   const [rating, setRating] = useState(0)
   const [review, setReview] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Load existing rating if available
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const existingRating = getClientRatingForBook(bookId)
+      if (existingRating) {
+        setRating(existingRating.rating)
+        setReview(existingRating.review)
+      }
+    }
+  }, [bookId])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,18 +47,20 @@ export default function BookRatingForm({ bookId }: BookRatingFormProps) {
     setIsSubmitting(true)
 
     try {
-      await rateBook(bookId, rating, review)
-      toast({
-        title: "Rating submitted",
-        description: "Thank you for your feedback!",
-      })
+      // Save rating to localStorage
+      const success = saveClientRating(bookId, rating, review)
 
-      // Reset form
-      setRating(0)
-      setReview("")
+      if (success) {
+        toast({
+          title: "Rating submitted",
+          description: "Thank you for your feedback!",
+        })
 
-      // Refresh the page to show updated ratings
-      router.refresh()
+        // Refresh the page to show updated ratings
+        router.refresh()
+      } else {
+        throw new Error("Failed to save rating")
+      }
     } catch (error) {
       console.error("Error submitting rating:", error)
       toast({

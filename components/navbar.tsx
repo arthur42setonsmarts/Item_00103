@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
 import { cn } from "@/lib/utils"
 import { Book, BookOpen, Home, List, User } from "lucide-react"
@@ -62,11 +61,6 @@ export default function Navbar() {
         </div>
         <div className="flex items-center gap-2">
           <ModeToggle />
-          <Link href="/profile">
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <User className="h-5 w-5" />
-            </Button>
-          </Link>
         </div>
       </div>
       <div className="md:hidden border-t">

@@ -5,11 +5,12 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
-import { createReadingList } from "@/lib/actions"
+import { useReadingLists } from "@/components/reading-lists-provider"
 import { Plus } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+
+// Define form validation schema
+const formSchema = z.object({
+  name: z.string().min(1, "Name is required").max(50, "Name must be less than 50 characters"),
+  description: z.string().max(200, "Description must be less than 200 characters").optional(),
+})
 
 interface CreateReadingListDialogProps {
   children?: React.ReactNode
@@ -27,47 +37,71 @@ interface CreateReadingListDialogProps {
 export default function CreateReadingListDialog({ children }: CreateReadingListDialogProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const { addReadingList } = useReadingLists()
   const [open, setOpen] = useState(false)
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  // Initialize form with react-hook-form and zod validation
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+    },
+  })
 
-    if (!name.trim()) {
-      toast({
-        title: "Name required",
-        description: "Please enter a name for your reading list",
-        variant: "destructive",
-      })
-      return
-    }
+  const isSubmitting = form.formState.isSubmitting
 
-    setIsSubmitting(true)
-
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const listId = await createReadingList(name, description)
+      // Generate a unique ID for the new reading list
+      const timestamp = Date.now()
+      const id = `list${timestamp}`
+
+      console.log(`Creating reading list: "${values.name}" with ID: ${id}`)
+
+      // Create the new reading list
+      const newList = {
+        id,
+        name: values.name,
+        description: values.description || "",
+        books: [],
+      }
+
+      // Add the reading list to client storage
+      addReadingList(newList)
+
+      // Close the dialog and reset the form
+      setOpen(false)
+      form.reset()
+
+      // Show success message
       toast({
         title: "Success",
         description: "Reading list created successfully",
       })
-      setOpen(false)
-      router.push(`/reading-lists/${listId}`)
+
+      // Force a refresh of the page
       router.refresh()
     } catch (error) {
+      console.error("Error creating reading list:", error)
       toast({
         title: "Error",
         description: "Failed to create reading list",
         variant: "destructive",
       })
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(newOpen) => {
+        setOpen(newOpen)
+        if (!newOpen) {
+          form.reset()
+        }
+      }}
+    >
       <DialogTrigger asChild>
         {children || (
           <Button>
@@ -81,40 +115,51 @@ export default function CreateReadingListDialog({ children }: CreateReadingListD
           <DialogTitle>Create Reading List</DialogTitle>
           <DialogDescription>Create a new reading list to organize your books.</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium">
-                Name
-              </label>
-              <Input
-                id="name"
-                placeholder="Enter reading list name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">
-                Description (Optional)
-              </label>
-              <Textarea
-                id="description"
-                placeholder="Enter a description for your reading list"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create"}
-            </Button>
-          </DialogFooter>
-        </form>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-2">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter reading list name" {...field} disabled={isSubmitting} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter a description for your reading list"
+                      {...field}
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter className="pt-4">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isSubmitting}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating..." : "Create"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   )

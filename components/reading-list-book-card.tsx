@@ -5,11 +5,11 @@ import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Trash2 } from "lucide-react"
+import { Trash2 } from 'lucide-react'
 import type { Book } from "@/lib/types"
 import RatingStars from "@/components/rating-stars"
 import { useToast } from "@/hooks/use-toast"
-import { removeFromReadingList } from "@/lib/actions"
+import { useReadingLists } from "@/components/reading-lists-provider"
 import { useRouter } from "next/navigation"
 import ShareButton from "./share-button"
 
@@ -22,16 +22,27 @@ interface ReadingListBookCardProps {
 export default function ReadingListBookCard({ book, listId, showRating = true }: ReadingListBookCardProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const { getReadingListById, updateReadingList } = useReadingLists()
   const [isRemoving, setIsRemoving] = useState(false)
 
   const handleRemove = async () => {
     setIsRemoving(true)
     try {
-      await removeFromReadingList(book.id, listId)
+      // Get the current reading list
+      const readingList = getReadingListById(listId)
+      if (!readingList) {
+        throw new Error(`Reading list with ID ${listId} not found`)
+      }
+      
+      // Remove the book from the list
+      const updatedBooks = readingList.books.filter(b => b.id !== book.id)
+      updateReadingList(listId, { books: updatedBooks })
+      
       toast({
         title: "Success",
-        description: `"${book.title}" removed from reading list`,
+        description: `${book.title} removed from ${readingList.name}`,
       })
+      
       router.refresh()
     } catch (error) {
       console.error("Error removing from reading list:", error)
@@ -69,18 +80,37 @@ export default function ReadingListBookCard({ book, listId, showRating = true }:
           </div>
         </Link>
       </CardContent>
-      <CardFooter className="flex justify-between p-4 pt-0">
+      <CardFooter className="flex justify-between p-1 pt-0 gap-1 sm:p-3 sm:pt-0 sm:pb-4">
+        {/* Mobile version - just a red icon */}
         <Button
-          variant="outline"
-          size="sm"
+          variant="ghost"
+          size="icon"
           onClick={handleRemove}
           disabled={isRemoving}
-          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+          className="h-7 w-7 text-destructive hover:bg-destructive/10 sm:hidden"
+          aria-label="Remove book from list"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+        
+        {/* Desktop version - button with text */}
+        <Button
+          variant="outline"
+          onClick={handleRemove}
+          disabled={isRemoving}
+          className="hidden sm:flex items-center text-destructive hover:bg-destructive/10 hover:text-destructive"
         >
           <Trash2 className="mr-2 h-4 w-4" />
-          {isRemoving ? "Removing..." : "Remove"}
+          Remove
         </Button>
-        <ShareButton url={`/books/${book.id}`} title={book.title} variant="ghost" size="icon" />
+        
+        <ShareButton 
+          url={`/books/${book.id}`} 
+          title={book.title} 
+          variant="ghost" 
+          size="icon" 
+          className="h-7 w-7 sm:h-10 sm:w-10 p-0" 
+        />
       </CardFooter>
     </Card>
   )

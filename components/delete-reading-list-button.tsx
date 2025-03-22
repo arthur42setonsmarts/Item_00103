@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
-import { deleteReadingList } from "@/lib/actions"
+import { useReadingLists } from "@/components/reading-lists-provider"
 import { Trash2 } from "lucide-react"
 import {
   AlertDialog,
@@ -25,6 +25,7 @@ interface DeleteReadingListButtonProps {
 export default function DeleteReadingListButton({ id }: DeleteReadingListButtonProps) {
   const router = useRouter()
   const { toast } = useToast()
+  const { deleteReadingList } = useReadingLists()
   const [isDeleting, setIsDeleting] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -32,7 +33,8 @@ export default function DeleteReadingListButton({ id }: DeleteReadingListButtonP
     setIsDeleting(true)
 
     try {
-      await deleteReadingList(id)
+      // Delete the reading list from client storage
+      deleteReadingList(id)
 
       // Close the dialog
       setIsOpen(false)
@@ -45,9 +47,6 @@ export default function DeleteReadingListButton({ id }: DeleteReadingListButtonP
 
       // Navigate to the reading lists page
       router.push("/reading-lists")
-
-      // Force a refresh of the page data
-      router.refresh()
     } catch (error) {
       console.error("Error deleting reading list:", error)
       toast({
@@ -72,7 +71,7 @@ export default function DeleteReadingListButton({ id }: DeleteReadingListButtonP
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your reading list and remove it from our servers.
+            This action cannot be undone. This will permanently delete your reading list.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
