@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -29,6 +29,40 @@ export default function BookSearch() {
 
   const [query, setQuery] = useState(initialQuery)
   const [genre, setGenre] = useState(initialGenre)
+
+  // Effect to handle URL parameter changes
+  useEffect(() => {
+    // Get the current genre from URL
+    const urlGenre = searchParams.get("genre")
+
+    // If there's a genre in the URL, normalize it and update the state
+    if (urlGenre) {
+      // Handle hyphenated genres like "science-fiction"
+      const normalizedGenre = urlGenre.toLowerCase()
+
+      // Check if this genre exists in our options
+      const matchedGenre = genres.find(
+        (g) =>
+          g.value === normalizedGenre ||
+          g.value === normalizedGenre.replace(/-/g, " ") ||
+          normalizedGenre === g.label.toLowerCase().replace(/ /g, "-"),
+      )
+
+      if (matchedGenre) {
+        setGenre(matchedGenre.value)
+      } else {
+        setGenre(urlGenre) // Use as-is if no match found
+      }
+    } else {
+      setGenre("all")
+    }
+
+    // Update query from URL
+    const urlQuery = searchParams.get("query")
+    if (urlQuery !== null) {
+      setQuery(urlQuery)
+    }
+  }, [searchParams])
 
   const handleSearch = () => {
     startTransition(() => {
@@ -82,7 +116,7 @@ export default function BookSearch() {
         Search
       </Button>
 
-      {(query || genre) && (
+      {(query || genre !== "all") && (
         <Button variant="outline" onClick={handleClear}>
           Clear
         </Button>

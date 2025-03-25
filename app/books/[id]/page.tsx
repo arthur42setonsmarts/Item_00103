@@ -2,14 +2,14 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { getBookById, getSimilarBooks } from "@/lib/actions"
-import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { BookOpen } from "lucide-react"
-import RatingStars from "@/components/rating-stars"
-import BookRatingForm from "@/components/book-rating-form"
 import BookCard from "@/components/book-card"
 import AddToReadingListButton from "@/components/add-to-reading-list-button"
 import ShareButton from "@/components/share-button"
+import BookReviewSection from "@/components/book-review-section"
+
+// Import the new component
+import RealBookRating from "@/components/real-book-rating"
 
 interface BookPageProps {
   params: {
@@ -17,6 +17,7 @@ interface BookPageProps {
   }
 }
 
+// Keep the metadata generation
 export async function generateMetadata({ params }: BookPageProps): Promise<Metadata> {
   const book = await getBookById(params.id)
 
@@ -58,12 +59,6 @@ export default async function BookPage({ params }: BookPageProps) {
 
           <div className="mt-6 flex flex-col gap-4">
             <AddToReadingListButton bookId={book.id} />
-
-            <Button variant="outline" className="w-full">
-              <BookOpen className="mr-2 h-4 w-4" />
-              Preview
-            </Button>
-
             <ShareButton url={`/books/${book.id}`} title={book.title} className="w-full" />
           </div>
         </div>
@@ -72,9 +67,8 @@ export default async function BookPage({ params }: BookPageProps) {
           <h1 className="text-3xl font-bold">{book.title}</h1>
           <p className="text-lg text-muted-foreground">by {book.author}</p>
 
-          <div className="mt-4 flex items-center gap-4">
-            <RatingStars rating={book.averageRating} size="lg" />
-            <span className="text-sm text-muted-foreground">({book.ratingsCount} ratings)</span>
+          <div className="mt-4">
+            <RealBookRating bookId={book.id} defaultRating={0} defaultCount={0} size="lg" showEmptyStars={true} />
           </div>
 
           <Separator className="my-6" />
@@ -105,7 +99,8 @@ export default async function BookPage({ params }: BookPageProps) {
 
           <Separator className="my-6" />
 
-          <BookRatingForm bookId={book.id} />
+          {/* Use the new client component that handles both reviews and rating form */}
+          <BookReviewSection book={book} />
         </div>
       </div>
 

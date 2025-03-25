@@ -6,6 +6,8 @@ import type { ReadingList } from "./types"
 // Keys for localStorage
 const READING_LISTS_KEY = "bookbuddy_reading_lists"
 const RATINGS_KEY = "bookbuddy_ratings"
+// Key for user name in localStorage
+const USER_NAME_KEY = "bookbuddy_user_name"
 
 // Type for the serialized reading lists
 type SerializedReadingLists = {
@@ -221,6 +223,14 @@ export function saveClientRating(bookId: string, rating: number, review: string)
     }
 
     localStorage.setItem(RATINGS_KEY, JSON.stringify(data))
+
+    // Dispatch a storage event to notify other components
+    if (typeof window !== "undefined") {
+      // Create and dispatch a custom event
+      const event = new Event("storage")
+      window.dispatchEvent(event)
+    }
+
     return true
   } catch (error) {
     console.error("Error saving rating to localStorage:", error)
@@ -236,6 +246,69 @@ export function getClientRatingForBook(bookId: string): BookRating | null {
   } catch (error) {
     console.error("Error getting rating for book:", error)
     return null
+  }
+}
+
+// Add this function to get real ratings stats for a book
+export function getBookRealRatings(bookId: string): { averageRating: number; ratingsCount: number } {
+  try {
+    // Only run in browser environment
+    if (typeof window === "undefined") {
+      return { averageRating: 0, ratingsCount: 0 }
+    }
+
+    const allRatings = getClientRatings()
+    const bookRatings = allRatings.filter((rating) => rating.bookId === bookId)
+
+    if (bookRatings.length === 0) {
+      return { averageRating: 0, ratingsCount: 0 }
+    }
+
+    const sum = bookRatings.reduce((total, rating) => total + rating.rating, 0)
+    const average = sum / bookRatings.length
+
+    return {
+      averageRating: average,
+      ratingsCount: bookRatings.length,
+    }
+  } catch (error) {
+    console.error("Error getting real ratings for book:", error)
+    return { averageRating: 0, ratingsCount: 0 }
+  }
+}
+
+// Get the user's name from localStorage
+export function getUserName(): string {
+  // Only run in browser environment
+  if (typeof window === "undefined") return "Jane Reader"
+
+  try {
+    const name = localStorage.getItem(USER_NAME_KEY)
+    return name || "Jane Reader" // Default name if not set
+  } catch (error) {
+    console.error("Error getting user name from localStorage:", error)
+    return "Jane Reader"
+  }
+}
+
+// Save the user's name to localStorage
+export function saveUserName(name: string): boolean {
+  // Only run in browser environment
+  if (typeof window === "undefined") return false
+
+  try {
+    localStorage.setItem(USER_NAME_KEY, name)
+
+    // Dispatch a storage event to notify other components
+    if (typeof window !== "undefined") {
+      const event = new Event("storage")
+      window.dispatchEvent(event)
+    }
+
+    return true
+  } catch (error) {
+    console.error("Error saving user name to localStorage:", error)
+    return false
   }
 }
 

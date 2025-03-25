@@ -7,11 +7,11 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import type { Book } from "@/lib/types"
-import RatingStars from "@/components/rating-stars"
 import { useToast } from "@/hooks/use-toast"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import ShareButton from "./share-button"
 import { useReadingLists } from "./reading-lists-provider"
+import RealBookRating from "./real-book-rating"
 
 interface BookCardProps {
   book: Book
@@ -80,7 +80,14 @@ export default function BookCard({ book, showRating = true, showActions = true }
             <p className="text-sm text-muted-foreground">{book.author}</p>
             {showRating && (
               <div className="mt-2">
-                <RatingStars rating={book.averageRating} />
+                <RealBookRating
+                  bookId={book.id}
+                  defaultRating={0}
+                  defaultCount={0}
+                  showCount={false}
+                  size="sm"
+                  showEmptyStars={true}
+                />
               </div>
             )}
           </div>

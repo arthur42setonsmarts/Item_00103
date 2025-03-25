@@ -1,8 +1,6 @@
 "use client"
 
 import { useReadingLists } from "@/components/reading-lists-provider"
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
 import ReadingListCard from "@/components/reading-list-card"
 import CreateReadingListDialog from "@/components/create-reading-list-dialog"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -39,13 +37,7 @@ export function ClientReadingLists() {
 
       {readingLists.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground mb-4">You don't have any reading lists yet.</p>
-          <CreateReadingListDialog>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Your First Reading List
-            </Button>
-          </CreateReadingListDialog>
+          <p className="text-muted-foreground">You don't have any reading lists yet.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

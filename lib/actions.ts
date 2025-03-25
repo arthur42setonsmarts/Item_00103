@@ -205,6 +205,9 @@ export async function getUserProfile(): Promise<UserProfile> {
 }
 
 export async function getRecentlyRatedBooks(): Promise<Book[]> {
+  // This function is no longer used directly in the profile page
+  // but we'll keep it updated for other potential uses
+
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 600))
 

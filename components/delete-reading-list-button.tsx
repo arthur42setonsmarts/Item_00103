@@ -25,9 +25,13 @@ interface DeleteReadingListButtonProps {
 export default function DeleteReadingListButton({ id }: DeleteReadingListButtonProps) {
   const router = useRouter()
   const { toast } = useToast()
-  const { deleteReadingList } = useReadingLists()
+  const { deleteReadingList, getReadingListById } = useReadingLists()
   const [isDeleting, setIsDeleting] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+
+  // Get the reading list name
+  const readingList = getReadingListById(id)
+  const readingListName = readingList?.name || "this reading list"
 
   const handleDelete = async () => {
     setIsDeleting(true)
@@ -69,9 +73,9 @@ export default function DeleteReadingListButton({ id }: DeleteReadingListButtonP
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle>Deleting Reading List</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your reading list.
+            Are you sure you want to permanently delete <strong>{readingListName}</strong>?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

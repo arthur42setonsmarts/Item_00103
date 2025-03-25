@@ -1,14 +1,14 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { getUserProfile, getRecentlyRatedBooks } from "@/lib/actions"
+import { getUserProfile } from "@/lib/actions"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BookOpen } from "lucide-react"
-import BookCard from "@/components/book-card"
 import ReadingStats from "@/components/reading-stats"
 import ShareButton from "@/components/share-button"
+import UserNameDisplay from "@/components/user-name-display"
+import UserRatedBooks from "@/components/user-rated-books"
 
 export const metadata: Metadata = {
   title: "My Profile | BookBuddy",
@@ -17,7 +17,6 @@ export const metadata: Metadata = {
 
 export default async function ProfilePage() {
   const user = await getUserProfile()
-  const recentlyRatedBooks = await getRecentlyRatedBooks()
 
   return (
     <div className="container py-8">
@@ -34,7 +33,9 @@ export default async function ProfilePage() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <CardTitle>{user.name}</CardTitle>
+              <div className="flex justify-center items-center mb-1">
+                <UserNameDisplay showEditButton={true} />
+              </div>
               <CardDescription>Joined {user.joinedDate}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -66,7 +67,7 @@ export default async function ProfilePage() {
                 <h3 className="mb-2 text-sm font-medium">Favorite Genres</h3>
                 <div className="flex flex-wrap gap-2">
                   {user.favoriteGenres.map((genre) => (
-                    <Link key={genre} href={`/books?genre=${genre.toLowerCase()}`}>
+                    <Link key={genre} href={`/books?genre=${genre.toLowerCase().replace(/ /g, "-")}`}>
                       <Button variant="outline" size="sm">
                         {genre}
                       </Button>
@@ -80,10 +81,9 @@ export default async function ProfilePage() {
 
         <div className="md:col-span-2">
           <Tabs defaultValue="stats">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="stats">Reading Stats</TabsTrigger>
               <TabsTrigger value="recent">Recent Activity</TabsTrigger>
-              <TabsTrigger value="recommendations">For You</TabsTrigger>
             </TabsList>
 
             <TabsContent value="stats" className="mt-6">
@@ -91,27 +91,8 @@ export default async function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="recent" className="mt-6">
-              <h2 className="mb-4 text-xl font-semibold">Recently Rated Books</h2>
-              {recentlyRatedBooks.length === 0 ? (
-                <div className="text-center py-12">
-                  <BookOpen className="mx-auto h-12 w-12 text-muted-foreground" />
-                  <p className="mt-4 text-muted-foreground">You haven't rated any books yet.</p>
-                  <Link href="/books">
-                    <Button className="mt-4">Browse Books</Button>
-                  </Link>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  {recentlyRatedBooks.map((book) => (
-                    <BookCard key={book.id} book={book} />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="recommendations" className="mt-6">
-              <h2 className="mb-4 text-xl font-semibold">Recommended For You</h2>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">{/* Recommendations will be loaded here */}</div>
+              <h2 className="mb-4 text-xl font-semibold">Your Rated Books</h2>
+              <UserRatedBooks />
             </TabsContent>
           </Tabs>
         </div>
