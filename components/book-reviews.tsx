@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import RatingStars from "@/components/rating-stars"
-import { getClientRatings, getUserName } from "@/lib/client-storage"
+import { getClientRatings, getUserName, getClientRatingForBook } from "@/lib/client-storage"
 import type { Book } from "@/lib/types"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { formatDistanceToNow } from "date-fns"
@@ -21,30 +21,74 @@ type Review = {
   rating: number
   review: string
   timestamp: number
+  userName?: string // Optional user name for mock reviews
+  isCurrentUser?: boolean // Flag to identify the current user's review
 }
 
 export default function BookReviews({ book, refreshTrigger = 0 }: BookReviewsProps) {
   const [reviews, setReviews] = useState<Review[]>([])
   const [ratingDistribution, setRatingDistribution] = useState<number[]>([0, 0, 0, 0, 0])
   const [averageRating, setAverageRating] = useState(0)
+  const [currentUserName, setCurrentUserName] = useState("")
 
   // Load reviews and calculate statistics
   useEffect(() => {
+    // Get current user name
+    setCurrentUserName(getUserName())
+
     // Get all ratings from client storage
     const allRatings = getClientRatings()
 
+    // Get the current user's rating specifically
+    const currentUserRating = getClientRatingForBook(book.id)
+
     // Filter ratings for this book
-    const bookReviews = allRatings.filter((rating) => rating.bookId === book.id)
+    let bookReviews = allRatings.filter((rating) => rating.bookId === book.id)
+
+    // If the current user has a rating but it's not in the list (which can happen if they just submitted it),
+    // add it to the list
+    if (
+      currentUserRating &&
+      !bookReviews.some(
+        (review) => review.timestamp === currentUserRating.timestamp && review.rating === currentUserRating.rating,
+      )
+    ) {
+      bookReviews = [...bookReviews, currentUserRating]
+    }
 
     // Sort by timestamp (newest first)
     bookReviews.sort((a, b) => b.timestamp - a.timestamp)
 
-    setReviews(bookReviews)
+    // Add mock user names to reviews that aren't from the current user
+    const reviewsWithNames = bookReviews.map((review) => {
+      // Check if this is the current user's review
+      const isCurrentUserReview =
+        currentUserRating &&
+        review.rating === currentUserRating.rating &&
+        review.review === currentUserRating.review &&
+        review.timestamp === currentUserRating.timestamp
 
-    // Calculate rating distribution - only from actual user reviews
+      if (isCurrentUserReview) {
+        return {
+          ...review,
+          isCurrentUser: true,
+        }
+      }
+
+      // Add mock names to other reviews
+      const mockNames = ["Alex Johnson", "Sam Taylor", "Jordan Smith", "Casey Williams", "Morgan Lee"]
+      return {
+        ...review,
+        userName: mockNames[Math.floor(Math.random() * mockNames.length)],
+      }
+    })
+
+    setReviews(reviewsWithNames)
+
+    // Calculate rating distribution - from all reviews including the user's
     const distribution = [0, 0, 0, 0, 0]
 
-    // Add ratings from client storage
+    // Add ratings from all reviews
     bookReviews.forEach((review) => {
       if (review.rating >= 1 && review.rating <= 5) {
         distribution[review.rating - 1]++
@@ -63,8 +107,7 @@ export default function BookReviews({ book, refreshTrigger = 0 }: BookReviewsPro
   }, [book.id, refreshTrigger])
 
   // Get initials for avatar
-  const getInitials = () => {
-    const name = getUserName()
+  const getInitials = (name: string) => {
     return name
       .split(" ")
       .map((part) => part[0])
@@ -131,12 +174,18 @@ export default function BookReviews({ book, refreshTrigger = 0 }: BookReviewsPro
                   <CardContent className="p-4">
                     <div className="flex items-start gap-4">
                       <Avatar>
-                        <AvatarFallback>{getInitials()}</AvatarFallback>
+                        <AvatarFallback>
+                          {review.isCurrentUser ? getInitials(currentUserName) : getInitials(review.userName || "")}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
                           <div>
-                            <UserNameDisplay />
+                            {review.isCurrentUser ? (
+                              <UserNameDisplay />
+                            ) : (
+                              <div className="font-medium">{review.userName}</div>
+                            )}
                             <div className="flex items-center gap-2">
                               <RatingStars rating={review.rating} size="sm" />
                               <span className="text-xs text-muted-foreground">

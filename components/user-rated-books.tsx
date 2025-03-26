@@ -60,7 +60,7 @@ export default function UserRatedBooks() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 animate-pulse">
+      <div className="grid grid-cols-1 sm:grid-cols-3 animate-pulse gap-4">
         {[...Array(3)].map((_, index) => (
           <div key={index} className="bg-muted rounded-lg aspect-[2/3]"></div>
         ))}
@@ -81,7 +81,7 @@ export default function UserRatedBooks() {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {books.map((book) => (
         <BookCard key={book.id} book={book} />
       ))}

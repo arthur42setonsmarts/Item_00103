@@ -190,6 +190,9 @@ export async function getUserProfile(): Promise<UserProfile> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 500))
 
+  // Get reading lists from the server-side data store
+  const readingLists = dataStore.getReadingLists()
+
   return {
     name: "Jane Reader",
     avatar: "/placeholder.svg?height=96&width=96",
@@ -197,9 +200,9 @@ export async function getUserProfile(): Promise<UserProfile> {
     bio: "Book lover and aspiring writer. I enjoy fiction, fantasy, and science fiction novels.",
     favoriteGenres: ["Fiction", "Fantasy", "Science Fiction", "Mystery"],
     stats: {
-      booksRead: 42,
-      listsCreated: 5,
-      ratingsGiven: 37,
+      booksRead: 42, // This will be removed from the UI
+      listsCreated: readingLists.length,
+      ratingsGiven: 0, // This will be updated by the client component
     },
   }
 }

@@ -27,7 +27,7 @@ export default function RecommendedBooks() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {[...Array(5)].map((_, index) => (
           <div key={index} className="space-y-3">
             <Skeleton className="aspect-[2/3] w-full" />
@@ -48,7 +48,7 @@ export default function RecommendedBooks() {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+    <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
       {books.map((book) => (
         <BookCard key={book.id} book={book} />
       ))}

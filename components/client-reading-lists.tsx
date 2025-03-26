@@ -17,7 +17,7 @@ export function ClientReadingLists() {
           <Skeleton className="h-10 w-40" />
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(3)].map((_, index) => (
             <Skeleton key={index} className="h-48 w-full" />
           ))}
@@ -40,7 +40,7 @@ export function ClientReadingLists() {
           <p className="text-muted-foreground">You don't have any reading lists yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {readingLists.map((list) => (
             <ReadingListCard key={list.id} readingList={list} />
           ))}

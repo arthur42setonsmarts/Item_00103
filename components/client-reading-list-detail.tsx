@@ -47,7 +47,7 @@ export function ClientReadingListDetail({ id }: ClientReadingListDetailProps) {
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {[...Array(5)].map((_, index) => (
             <Skeleton key={index} className="h-64 w-full" />
           ))}
@@ -87,7 +87,7 @@ export function ClientReadingListDetail({ id }: ClientReadingListDetailProps) {
             <p className="text-muted-foreground">This reading list is empty. Add some books to get started!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {readingList.books.map((book) => (
               <ReadingListBookCard key={book.id} book={book} listId={readingList.id} />
             ))}

@@ -9,6 +9,7 @@ import ReadingStats from "@/components/reading-stats"
 import ShareButton from "@/components/share-button"
 import UserNameDisplay from "@/components/user-name-display"
 import UserRatedBooks from "@/components/user-rated-books"
+import ProfileStats from "@/components/profile-stats"
 
 export const metadata: Metadata = {
   title: "My Profile | BookBuddy",
@@ -43,20 +44,7 @@ export default async function ProfilePage() {
                 <ShareButton url={`/profile`} title="My Profile" variant="outline" size="sm" />
               </div>
 
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-2xl font-bold">{user.stats.booksRead}</p>
-                  <p className="text-xs text-muted-foreground">Books Read</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{user.stats.listsCreated}</p>
-                  <p className="text-xs text-muted-foreground">Lists</p>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{user.stats.ratingsGiven}</p>
-                  <p className="text-xs text-muted-foreground">Ratings</p>
-                </div>
-              </div>
+              <ProfileStats />
 
               <div className="pt-4">
                 <h3 className="mb-2 text-sm font-medium">About</h3>

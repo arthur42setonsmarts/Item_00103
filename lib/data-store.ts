@@ -75,6 +75,77 @@ const initialBooks: Book[] = [
     averageRating: 4.4,
     ratingsCount: 1532,
   },
+  // Adding more books
+  {
+    id: "6",
+    title: "Dune",
+    author: "Frank Herbert",
+    description:
+      "Set on the desert planet Arrakis, Dune is the story of the boy Paul Atreides, heir to a noble family tasked with ruling an inhospitable world where the only thing of value is the &quot;spice&quot; melange, a drug capable of extending life and enhancing consciousness.",
+    coverImage: "/placeholder.svg?height=300&width=200",
+    publishedDate: "1965-08-01",
+    genre: "Science Fiction",
+    pageCount: 412,
+    isbn: "9780441172719",
+    averageRating: 4.6,
+    ratingsCount: 2345,
+  },
+  {
+    id: "7",
+    title: "The Song of Achilles",
+    author: "Madeline Miller",
+    description:
+      "A tale of gods, kings, immortal fame, and the human heart, The Song of Achilles is a dazzling literary feat that brilliantly reimagines Homer's enduring masterwork, The Iliad.",
+    coverImage: "/placeholder.svg?height=300&width=200",
+    publishedDate: "2012-03-06",
+    genre: "Historical Fiction",
+    pageCount: 378,
+    isbn: "9780062060624",
+    averageRating: 4.7,
+    ratingsCount: 1876,
+  },
+  {
+    id: "8",
+    title: "Educated",
+    author: "Tara Westover",
+    description:
+      "An unforgettable memoir about a young girl who, kept out of school, leaves her survivalist family and goes on to earn a PhD from Cambridge University.",
+    coverImage: "/placeholder.svg?height=300&width=200",
+    publishedDate: "2018-02-20",
+    genre: "Non-Fiction",
+    pageCount: 334,
+    isbn: "9780399590504",
+    averageRating: 4.5,
+    ratingsCount: 2103,
+  },
+  {
+    id: "9",
+    title: "Where the Crawdads Sing",
+    author: "Delia Owens",
+    description:
+      "For years, rumors of the 'Marsh Girl' have haunted Barkley Cove, a quiet town on the North Carolina coast. So in late 1969, when handsome Chase Andrews is found dead, the locals immediately suspect Kya Clark, the so-called Marsh Girl.",
+    coverImage: "/placeholder.svg?height=300&width=200",
+    publishedDate: "2018-08-14",
+    genre: "Fiction",
+    pageCount: 368,
+    isbn: "9780735219090",
+    averageRating: 4.8,
+    ratingsCount: 2567,
+  },
+  {
+    id: "10",
+    title: "The Silent Patient",
+    author: "Alex Michaelides",
+    description:
+      "Alicia Berenson's life is seemingly perfect. A famous painter married to an in-demand fashion photographer, she lives in a grand house with big windows overlooking a park in one of London's most desirable areas. One evening her husband Gabriel returns home late from a fashion shoot, and Alicia shoots him five times in the face, and then never speaks another word.",
+    coverImage: "/placeholder.svg?height=300&width=200",
+    publishedDate: "2019-02-05",
+    genre: "Thriller",
+    pageCount: 325,
+    isbn: "9781250301697",
+    averageRating: 4.3,
+    ratingsCount: 1932,
+  },
 ]
 
 // Initial reading lists
@@ -83,25 +154,25 @@ const initialReadingLists: ReadingList[] = [
     id: "to-read",
     name: "To Read",
     description: "Books I want to read in the future",
-    books: [initialBooks[2], initialBooks[3]],
+    books: [initialBooks[2], initialBooks[3], initialBooks[8]],
   },
   {
     id: "currently-reading",
     name: "Currently Reading",
     description: "Books I'm reading right now",
-    books: [initialBooks[0]],
+    books: [initialBooks[0], initialBooks[6]],
   },
   {
     id: "read",
     name: "Read",
     description: "Books I've finished reading",
-    books: [],
+    books: [initialBooks[9]],
   },
   {
     id: "favorites",
     name: "Favorites",
     description: "My all-time favorite books",
-    books: [initialBooks[1], initialBooks[4]],
+    books: [initialBooks[1], initialBooks[4], initialBooks[5]],
   },
 ]
 

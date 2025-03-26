@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import RatingStars from "@/components/rating-stars"
-import { getBookRealRatings } from "@/lib/client-storage"
+import { getBookRealRatings, getClientRatingForBook } from "@/lib/client-storage"
 
 interface RealBookRatingProps {
   bookId: string
@@ -31,10 +31,14 @@ export default function RealBookRating({
     // Only run in browser
     if (typeof window === "undefined") return
 
+    // Get all ratings from client storage
     const { averageRating, ratingsCount } = getBookRealRatings(bookId)
 
+    // Check if the current user has rated this book
+    const userRating = getClientRatingForBook(bookId)
+
     // If there are user ratings, use them
-    if (ratingsCount > 0) {
+    if (ratingsCount > 0 || userRating) {
       setRating(averageRating)
       setCount(ratingsCount)
       setHasRatings(true)
@@ -51,7 +55,9 @@ export default function RealBookRating({
   useEffect(() => {
     const handleStorageChange = () => {
       const { averageRating, ratingsCount } = getBookRealRatings(bookId)
-      if (ratingsCount > 0) {
+      const userRating = getClientRatingForBook(bookId)
+
+      if (ratingsCount > 0 || userRating) {
         setRating(averageRating)
         setCount(ratingsCount)
         setHasRatings(true)

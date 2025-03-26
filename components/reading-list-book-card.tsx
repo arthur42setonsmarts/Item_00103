@@ -13,6 +13,16 @@ import { useReadingLists } from "@/components/reading-lists-provider"
 import { useRouter } from "next/navigation"
 import ShareButton from "./share-button"
 import { ToastAction } from "@/components/ui/toast"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface ReadingListBookCardProps {
   book: Book
@@ -25,6 +35,7 @@ export default function ReadingListBookCard({ book, listId, showRating = true }:
   const { toast } = useToast()
   const { getReadingListById, updateReadingList } = useReadingLists()
   const [isRemoving, setIsRemoving] = useState(false)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
 
   const handleRemove = async () => {
     setIsRemoving(true)
@@ -47,6 +58,9 @@ export default function ReadingListBookCard({ book, listId, showRating = true }:
       // Remove the book from the list
       const updatedBooks = readingList.books.filter((b) => b.id !== book.id)
       updateReadingList(listId, { books: updatedBooks })
+
+      // Close the confirmation dialog
+      setIsConfirmOpen(false)
 
       // Show success toast with undo button
       toast({
@@ -94,6 +108,10 @@ export default function ReadingListBookCard({ book, listId, showRating = true }:
     }
   }
 
+  // Get the reading list name for the confirmation dialog
+  const readingList = getReadingListById(listId)
+  const listName = readingList?.name || "this reading list"
+
   return (
     <Card className="overflow-hidden">
       <CardContent className="p-0">
@@ -123,8 +141,7 @@ export default function ReadingListBookCard({ book, listId, showRating = true }:
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleRemove}
-          disabled={isRemoving}
+          onClick={() => setIsConfirmOpen(true)}
           className="h-7 w-7 sm:hidden"
           aria-label="Remove book from list"
         >
@@ -132,7 +149,7 @@ export default function ReadingListBookCard({ book, listId, showRating = true }:
         </Button>
 
         {/* Desktop version - button with text */}
-        <Button variant="ghost" onClick={handleRemove} disabled={isRemoving} className="hidden sm:flex items-center">
+        <Button variant="ghost" onClick={() => setIsConfirmOpen(true)} className="hidden sm:flex items-center">
           <Trash2 className="mr-2 h-4 w-4" />
           Remove
         </Button>
@@ -144,6 +161,31 @@ export default function ReadingListBookCard({ book, listId, showRating = true }:
           size="icon"
           className="h-7 w-7 sm:h-8 sm:w-8 p-0"
         />
+
+        {/* Confirmation Dialog */}
+        <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove Book</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to remove <strong>{book.title}</strong> from <strong>{listName}</strong>?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleRemove()
+                }}
+                disabled={isRemoving}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isRemoving ? "Removing..." : "Remove"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardFooter>
     </Card>
   )
