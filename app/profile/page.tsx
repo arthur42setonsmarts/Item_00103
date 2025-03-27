@@ -4,8 +4,6 @@ import Link from "next/link"
 import { getUserProfile } from "@/lib/actions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import ReadingStats from "@/components/reading-stats"
 import ShareButton from "@/components/share-button"
 import UserNameDisplay from "@/components/user-name-display"
 import UserRatedBooks from "@/components/user-rated-books"
@@ -68,21 +66,8 @@ export default async function ProfilePage() {
         </div>
 
         <div className="md:col-span-2">
-          <Tabs defaultValue="stats">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="stats">Reading Stats</TabsTrigger>
-              <TabsTrigger value="recent">Recent Activity</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="stats" className="mt-6">
-              <ReadingStats />
-            </TabsContent>
-
-            <TabsContent value="recent" className="mt-6">
-              <h2 className="mb-4 text-xl font-semibold">Your Rated Books</h2>
-              <UserRatedBooks />
-            </TabsContent>
-          </Tabs>
+          <h2 className="text-2xl font-bold mb-6">Your Rated Books</h2>
+          <UserRatedBooks />
         </div>
       </div>
     </div>
